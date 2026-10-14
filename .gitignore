@@ -1,1 +1,4 @@
-*json *.exe
+*.json
+*.exe
+__pycache__/
+*.py[cod]
