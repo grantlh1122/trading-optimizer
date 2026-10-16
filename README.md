@@ -1,40 +1,45 @@
 # Trading Optimizer
 
-This repository is a draft for a program that will use machine learning to
-optimize technical-analysis parameters across changing time periods and
-different funds.
+A timestamp-aware, long-only backtesting core for evaluating technical
+strategies against an already-downloaded market-data snapshot.
 
-The project design is still being researched. This document describes the
-current file layout, not a finalized data pipeline or trading strategy. The
-project owner will decide the input sources, data formats, model, evaluation
-rules, and execution details before those are implemented.
+The first implemented strategy is a moving-average crossover. Strategy code is
+kept separate from execution and accounting: it only emits Buy, Sell, or Hold
+from historical completed candles. The backtester owns order timing, account
+cash, protective exits, equity, and walk-forward parameter changes.
 
-## File layout
+## What is implemented
 
-- `market.py` — planned home for market-data input and related preparation.
-  The exact source, schema, validation rules, and cleaning steps remain to be
-  decided.
-- `backtest.cpp` — planned home for backtesting calculations and simulation.
-  Its interface with the Python files, supported trading rules, and accounting
-  behavior remain to be designed.
-- `training.py` — planned home for model training and parameter selection.
-  The model, features, objective, and training procedure are not selected yet.
-- `result.py` — planned home for collecting and presenting outputs from a
-  training or backtest run. The result format and reporting needs remain open.
-- `Makefile` — reserved for documented build or development commands once the
-  project has concrete build steps.
-- `.gitignore` — excludes generated files that should not be committed.
+- Abstract C++ `Strategy` interface plus moving-average crossover logic in
+  `strategies.cpp`.
+- One-candle-at-a-time simulation in `backtest.cpp`.
+- Next-market-open fills for close-derived signals; closed-market signals stay
+  queued until a tradable candle arrives.
+- Long-only sizing, whole shares, explicit fills, open-trade state, equity
+  curve, and Sharpe-ratio status.
+- Take-profit and stop-loss fractions where `0.0` means disabled, including
+  when parameters originated in an Optuna trial.
+- Explicit UTC dataset and backtest-window contracts in `market.py` and
+  `training.py`; the simulated end comes from the last complete downloaded bar,
+  never the host clock.
+- Deterministic C++ regression tests.
 
-## Draft flow
+## Build
 
-The intended high-level flow is market data into a backtest or training step,
-followed by results that can be reviewed. This is only a sketch of the
-components: it does not yet define how data moves between them or which
-component owns shared calculations.
+```bash
+make test
+```
 
-## Development status
+## Design guide
 
-The files are currently a documented scaffold. They intentionally contain no
-data-source integration, model implementation, trading rules, or performance
-claims. As decisions are made, document the chosen behavior in the relevant
-module before adding implementation so each part can be reviewed on its own.
+Read [PIPELINE.md](PIPELINE.md) for the full data flow, execution sequence,
+time-window rule, parameter-schedule behavior, OHLC assumptions, and a
+recommended path to an Alpaca adapter, Optuna integration, and user-facing
+application.
+
+## Current limits
+
+There is no Alpaca SDK adapter, Python/C++ binding, user interface, costs,
+slippage, corporate-action handling, margin, or short selling yet. Those
+features should be added around the existing strategy/execution boundary so
+they do not make strategy results incomparable.

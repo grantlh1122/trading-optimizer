@@ -46,7 +46,7 @@
 namespace trading_optimizer {
 
 // All cash, prices, and notional values in this file use U.S. dollars.
-constexpr double kInitialCashDollars = 1'000'000.0;
+constexpr double kInitialCashDollars = 100'000.0;
 
 // Trade id zero is reserved to mean that a buy request was not accepted.
 using TradeId = std::uint64_t;
