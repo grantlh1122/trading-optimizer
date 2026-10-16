@@ -1,3 +1,6 @@
+#include <vector>
+#include <iostream>
+#include <cassert>
 //money and orders go here
 /*
 
@@ -31,3 +34,33 @@ can do this. anyways the live bot, in 5 years will
 run only 9 individual times, all with the same 
 account.
 */
+
+class Account {
+ public:
+    //ctors: initial
+    Account();
+
+    int placeOrder(){
+        assert(false);
+    }
+
+ private:
+    double buyingPower = 100'000;
+    std::vector<Position> positions;
+};
+
+struct Position{
+    enum class Side { Buy = 1, Sell = -1};
+    int quantity;
+    double entry_price;
+    double stop_loss_price;
+    double take_profit_price;
+    Side side; 
+
+    Position(int qty, double price, Side side){
+        this->quantity = qty;
+        this->entry_price = price;
+        this->side = side;
+    }
+};
+
