@@ -39,7 +39,4 @@ application.
 
 ## Current limits
 
-There is no Alpaca SDK adapter, Python/C++ binding, user interface, costs,
-slippage, corporate-action handling, margin, or short selling yet. Those
-features should be added around the existing strategy/execution boundary so
-they do not make strategy results incomparable.
+There is no Alpaca SDK adapter, Python/C++ binding, user interface yet.
