@@ -1,40 +1,35 @@
-# Trading Optimizer
+Flow:
+Backtester creates account (stores positions) and 
+strategy object (which stores all params), passes a bunch of candles to strategy (1 year)
+Backtester starts. for each candle:
+Backtester asks for signal from strategy. Strategy generates order request. 
+Do it at the price of the next open.
+Then backtester passes the order -1 or 1 to the account. The account will attempt to buy/sell this number. 
+account will always sell the given quantity or as many as possible, same goes for buying.
+Account will turn this into a position, which will be checked every candle by the backtest.
+If it was a take profit or stoploss hit, determine if it
+happened (1) before open (sell at open) or (2) during candle (sell high/low)
 
-This repository is a draft for a program that will use machine learning to
-optimize technical-analysis parameters across changing time periods and
-different funds.
+To be designed:
+each time the backtest is run, it will be on a set period. need system to keep that consistent, and to research how candles work.
+either keep one backtest object for all of the live test and hotswap params (recommend), or somehow make
+a new instance every 6 months and copy account over. What's easier, faster, how would i get account?
+maybe one function runs the backtest and dies after the period, returning sharpe ratio, one returns account.
+or maybe it just returns a backtestresult object or json, the training gets the sharpe ratio and the 
+main program that gets the parameters could call the backtest on different periods and recreate each account.
+that sounds like a pain in the ass though, maybe just keep the backtest alive whole time?
 
-The project design is still being researched. This document describes the
-current file layout, not a finalized data pipeline or trading strategy. The
-project owner will decide the input sources, data formats, model, evaluation
-rules, and execution details before those are implemented.
+pitfall: how do we change parameters? shouldn't change candles, in fact should keep all candles and stuff like MA
+when we change parameters, there will be variables to change in a function. 
+im thinking, every time you backtest you pass in 1 year prior of candles instantly, just to determine indicators.
+then run 6 months of candles, actually simulating trades. If training, return sharpe ratio to optuna. 
+if live trading, pass the candles and hotswap parameters (on close?)
+the main backtesting object should pass in the same candles as the training ones (not at the same time.
+training happens thousands of times on the same period). Choose one or the other to do first.
+prob easier to get newest params (if not first period), simulate the one backtest (using one backtest object that has 
+every candle). then, run the training on that same period (many times with many different parameters) on a new backtest
+object each time. this means we somehow have to determine which candles the backtester gets (adding the precandles)
+and where we are in time. TRY to get codex to turn this into a program flow file.
 
-## File layout
-
-- `market.py` — planned home for market-data input and related preparation.
-  The exact source, schema, validation rules, and cleaning steps remain to be
-  decided.
-- `backtest.cpp` — planned home for backtesting calculations and simulation.
-  Its interface with the Python files, supported trading rules, and accounting
-  behavior remain to be designed.
-- `training.py` — planned home for model training and parameter selection.
-  The model, features, objective, and training procedure are not selected yet.
-- `result.py` — planned home for collecting and presenting outputs from a
-  training or backtest run. The result format and reporting needs remain open.
-- `Makefile` — reserved for documented build or development commands once the
-  project has concrete build steps.
-- `.gitignore` — excludes generated files that should not be committed.
-
-## Draft flow
-
-The intended high-level flow is market data into a backtest or training step,
-followed by results that can be reviewed. This is only a sketch of the
-components: it does not yet define how data moves between them or which
-component owns shared calculations.
-
-## Development status
-
-The files are currently a documented scaffold. They intentionally contain no
-data-source integration, model implementation, trading rules, or performance
-claims. As decisions are made, document the chosen behavior in the relevant
-module before adding implementation so each part can be reviewed on its own.
+1 warmup year, 4 years of training/ trading. 6 month periods means 8 training periods and 7 trading, assuming we continue 
+training up till end to display final reccomended params.
