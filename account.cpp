@@ -51,17 +51,23 @@ class Account {
 };
 
 struct Position{
-    enum class Side { Buy = 1, Sell = -1};
+    //for if I want to add short/long
+    //enum class Side { Long = 1, Short = -1};
+    //Side side; 
     int quantity;
     double entry_price;
     double stop_loss_price;
     double take_profit_price;
-    Side side; 
-
-    Position(int qty, double price, Side side){
+    
+    Position(int qty, double price){
         this->quantity = qty;
         this->entry_price = price;
-        this->side = side;
+    }
+    Position(int qty, double price, double stop_loss_price, double take_profit_price){
+        this->quantity = qty;
+        this->entry_price = price;
+        this->stop_loss_price = stop_loss_price;
+        this->take_profit_price = take_profit_price;
     }
 };
 
