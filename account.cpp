@@ -51,6 +51,7 @@ struct Position{
     // if 0, no stop loss / take profit for that order
     double stop_loss_price = -1;
     double take_profit_price = -1;
+    //if any value here is -1, something went wrong.
     
     Position(int qty, double price, double stop_loss_price, double take_profit_price) : 
     quantity(qty), entry_price(price), stop_loss_price(stop_loss_price), take_profit_price(take_profit_price){}
