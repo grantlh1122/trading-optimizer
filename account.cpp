@@ -36,38 +36,72 @@ run only 9 individual times, all with the same
 account.
 */
 
-class Account {
- public:
-    //ctors: initial
-    Account();
-
-    int placeOrder(){
-        assert(false);
-    }
-
- private:
-    double buyingPower = 100'000;
-    std::vector<Position> positions;
+enum OrderType{
+    BUY = 1,
+    SELL = -1
 };
+
 
 struct Position{
     //for if I want to add short/long
     //enum class Side { Long = 1, Short = -1};
     //Side side; 
-    int quantity;
-    double entry_price;
-    double stop_loss_price;
-    double take_profit_price;
+    int quantity = -1;
+    double entry_price = -1;
+    // if 0, no stop loss / take profit for that order
+    double stop_loss_price = -1;
+    double take_profit_price = -1;
     
-    Position(int qty, double price){
-        this->quantity = qty;
-        this->entry_price = price;
-    }
-    Position(int qty, double price, double stop_loss_price, double take_profit_price){
-        this->quantity = qty;
-        this->entry_price = price;
-        this->stop_loss_price = stop_loss_price;
-        this->take_profit_price = take_profit_price;
-    }
+    Position(int qty, double price, double stop_loss_price, double take_profit_price) : 
+    quantity(qty), entry_price(price), stop_loss_price(stop_loss_price), take_profit_price(take_profit_price){}
+
 };
+
+
+class Account {
+ public:
+    //ctors: initial and passing prev orders
+    Account();
+    Account();
+
+    //TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
+    //this will require a system that allows multiple tickers
+    //TODO: assert bad inputs
+    void placeOrder(double risk_frac, double price, OrderType type, double stop_loss_price = 0, double take_profit_price = 0){
+        if (type == BUY){
+            buyOrder(risk_frac, price, stop_loss_price, take_profit_price);
+        }
+        if (type == SELL){
+            sellOrder(price);
+        }
+    }
+
+    //calculates how many you're willing to buy with risk fraction.
+    //then buys that many or as many as can be afforded.
+    void buyOrder(double risk_frac, double price, double stop_loss_price, double take_profit_price){
+        int qty = (int)((buyingPower * risk_frac) / (price - stop_loss_price));
+        int qty_afforded = (int)(buyingPower / price);
+        qty = std::min(qty, qty_afforded);
+
+        if(qty > 0){
+            positions.push_back(Position(qty, price, stop_loss_price, take_profit_price));
+        }
+    }
+
+    //sells all positions TODO: of a given ticker
+    void sellOrder(double price){
+        for(int i = positions.size(); i >= 0; --i){
+            buyingPower += price * positions[i].quantity;
+            positions.erase(positions.begin() + i);
+        }
+    }
+
+ private:
+    double buyingPower = 100'000;
+    std::vector<Position> positions;
+    int quantity = 0;
+};
+
+
+
 
