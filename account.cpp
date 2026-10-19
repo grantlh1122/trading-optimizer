@@ -100,9 +100,13 @@ class Account {
  private:
     double buyingPower = 100'000;
     std::vector<Position> positions;
-    int quantity = 0;
+    //map of tickers to quantity
 };
 
+int main(){
 
+    Account Grant;
+    //todo: test basic order system
+}
 
 
