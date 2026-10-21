@@ -45,36 +45,37 @@ enum OrderType{
 class Account {
  public:
     //ctors: initial and passing prev orders
-    Account();
-    Account();
+    Account() {};
+    //Account(); TODO: add constructor that can pass in starting balance. no need to pass in positions
 
     //TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
     //this will require a system that allows multiple tickers
-    //TODO: assert bad inputs
-    void placeOrder(double risk_frac, double price, OrderType type, double stop_loss_price = 0, double take_profit_price = 0){
-        if (type == BUY){
-            buyOrder(risk_frac, price, stop_loss_price, take_profit_price);
-        }
-        if (type == SELL){
-            sellOrder(price);
-        }
+    //TODO: assert bad inputs, figure out how backtester should get strategy order here.
+    void placeOrder(OrderType type, double risk_frac, double price, double stop_loss_price = 0, double take_profit_price = 0){
+        buyOrder(risk_frac, price, stop_loss_price, take_profit_price);
+    }
+
+    void placeOrder(OrderType type, double price){
+        sellOrder(price);
     }
 
     //calculates how many you're willing to buy with risk fraction.
     //then buys that many or as many as can be afforded.
-    void buyOrder(double risk_frac, double price, double stop_loss_price, double take_profit_price){
+    //TODO: calculate slippage
+    void buyOrder(double risk_frac, double price, double stop_loss_price = 0, double take_profit_price = 0){
         int qty = (int)((buyingPower * risk_frac) / (price - stop_loss_price));
         int qty_afforded = (int)(buyingPower / price);
         qty = std::min(qty, qty_afforded);
 
         if(qty > 0){
             positions.push_back(Position(qty, price, stop_loss_price, take_profit_price));
+            buyingPower -= qty * price;
         }
     }
 
-    //sells all positions TODO: of a given ticker
+    //sells all positions TODO: of a given ticker, Slippage
     void sellOrder(double price){
-        for(int i = positions.size(); i >= 0; --i){
+        for(int i = positions.size() - 1; i >= 0; --i){
             buyingPower += price * positions[i].quantity;
             positions.erase(positions.begin() + i);
         }
@@ -96,6 +97,7 @@ class Account {
         quantity(qty), entry_price(price), stop_loss_price(stop_loss_price), take_profit_price(take_profit_price){}
 
     };
+    
     double buyingPower = 100'000;
     std::vector<Position> positions;
     //map of tickers to quantity
@@ -104,7 +106,11 @@ class Account {
 int main(){
 
     Account Grant;
-    //todo: test basic order system
+    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
+    Grant.placeOrder(SELL, 150);
+    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
+    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
+    
 }
 
 
