@@ -8,3 +8,5 @@ struct Candle {
     double close;
     int volume;
 };
+
+//store in PANDAS DATAFRAME 
