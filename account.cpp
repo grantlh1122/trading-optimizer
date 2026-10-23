@@ -36,33 +36,30 @@ run only 9 individual times, all with the same
 account.
 */
 
-enum OrderType{
-    BUY = 1,
-    SELL = -1
-};
+//enum OrderType{
+///    BUY = 1,
+//    SELL = -1
+//};
 
 
 class Account {
  public:
     //ctors: initial and passing prev orders
     Account() {};
-    //Account(); TODO: add constructor that can pass in starting balance. no need to pass in positions
+    Account(double buyingPower) : buyingPower(buyingPower) {};
 
     //TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
     //this will require a system that allows multiple tickers
-    //TODO: assert bad inputs, figure out how backtester should get strategy order here.
-    void placeOrder(OrderType type, double risk_frac, double price, double stop_loss_price = 0, double take_profit_price = 0){
-        buyOrder(risk_frac, price, stop_loss_price, take_profit_price);
-    }
 
-    void placeOrder(OrderType type, double price){
-        sellOrder(price);
-    }
 
     //calculates how many you're willing to buy with risk fraction.
     //then buys that many or as many as can be afforded.
     //TODO: calculate slippage
     void buyOrder(double risk_frac, double price, double stop_loss_price = 0, double take_profit_price = 0){
+        assert(risk_frac >= 0 && risk_frac <= 1 && price >= 0 && stop_loss_price >= 0 && take_profit_price >= 0);
+        assert(stop_loss_price <= price && take_profit_price >= price);
+
+        price *= 1 + SLIPPAGE_RATE;
         int qty = (int)((buyingPower * risk_frac) / (price - stop_loss_price));
         int qty_afforded = (int)(buyingPower / price);
         qty = std::min(qty, qty_afforded);
@@ -75,6 +72,7 @@ class Account {
 
     //sells all positions TODO: of a given ticker, Slippage
     void sellOrder(double price){
+        price *= 1 - SLIPPAGE_RATE;
         for(int i = positions.size() - 1; i >= 0; --i){
             buyingPower += price * positions[i].quantity;
             positions.erase(positions.begin() + i);
@@ -82,7 +80,7 @@ class Account {
     }
 
  private:
-        struct Position{
+    struct Position{
         //for if I want to add short/long
         //enum class Side { Long = 1, Short = -1};
         //Side side; 
@@ -97,7 +95,8 @@ class Account {
         quantity(qty), entry_price(price), stop_loss_price(stop_loss_price), take_profit_price(take_profit_price){}
 
     };
-    
+
+    static const double SLIPPAGE_RATE = 0.001;
     double buyingPower = 100'000;
     std::vector<Position> positions;
     //map of tickers to quantity
@@ -106,10 +105,10 @@ class Account {
 int main(){
 
     Account Grant;
-    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
-    Grant.placeOrder(SELL, 150);
-    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
-    Grant.placeOrder(BUY, 0.01, 100, 90, 110);
+    Grant.buyOrder(0.01, 100, 90, 110);
+    Grant.sellOrder(150);
+    Grant.buyOrder(0.01, 100, 90, 110);
+    Grant.buyOrder(0.01, 100, 90, 110);
     
 }
 
