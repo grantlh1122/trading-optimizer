@@ -37,12 +37,6 @@ run only 9 individual times, all with the same
 account.
 */
 
-//enum OrderType{
-///    BUY = 1,
-//    SELL = -1
-//};
-
-
 class Account {
  public:
     //ctors: initial and passing prev orders
