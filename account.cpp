@@ -2,7 +2,8 @@
 #include <iostream>
 #include <cassert>
 
-//money and orders go here
+//todo: make header file for this and backtester
+
 /*
 
 backtester will make an account object and a 
