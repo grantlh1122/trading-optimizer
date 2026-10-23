@@ -1,7 +1,8 @@
 #include <cstdint>
 
 struct Candle {
-    std::int64_t timestamp;
+    //todo: add date to each candle
+    //std::int64_t timestamp;
     double open;
     double high;
     double low;
