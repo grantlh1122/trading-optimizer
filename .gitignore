@@ -1,3 +1,4 @@
 *.json
 *.exe
-
+/extern/pybind11/
+*.so
