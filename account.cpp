@@ -96,7 +96,7 @@ class Account {
 
     };
 
-    static const double SLIPPAGE_RATE = 0.001;
+    static constexpr double SLIPPAGE_RATE = 0.001;
     double buyingPower = 100'000;
     std::vector<Position> positions;
     //map of tickers to quantity
