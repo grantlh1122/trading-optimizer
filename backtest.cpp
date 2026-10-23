@@ -20,18 +20,18 @@ class Backtest {
  public: 
    Backtest() = default;
 
-   std::vector<Candle> loadCandles(
-      py::array_t<std::int64_t> timestamp_arr,
+   void loadCandles(
       py::array_t<double> open_arr,
       py::array_t<double> high_arr,
       py::array_t<double> low_arr,
       py::array_t<double> close_arr,
       py::array_t<int> volume_arr
    ){
+      std::cout << "hi" << std::endl;
       candles.clear();
 
       //what dis do Gets buffer for pointers
-      auto buffer_timestamp = timestamp_arr.request();
+      //auto buffer_timestamp = timestamp_arr.request();
       auto buffer_open = open_arr.request();
       auto buffer_high = high_arr.request();
       auto buffer_low = low_arr.request();
@@ -39,7 +39,7 @@ class Backtest {
       auto buffer_volume = volume_arr.request();
 
       //what dis do Sets pointers to the buffers
-      std::int64_t* ptr_timestamp = static_cast<std::int64_t*>(buffer_timestamp.ptr);
+      //std::int64_t* ptr_timestamp = static_cast<std::int64_t*>(buffer_timestamp.ptr);
       double* ptr_open = static_cast<double*>(buffer_open.ptr);
       double* ptr_high = static_cast<double*>(buffer_high.ptr);
       double* ptr_low = static_cast<double*>(buffer_low.ptr);
@@ -50,8 +50,7 @@ class Backtest {
       candles.reserve(num_candles);
 
       for(int i = 0; i < num_candles; ++i){
-         candles.push_back(
-            {ptr_timestamp[i], 
+         candles.push_back({
             ptr_open[i], 
             ptr_high[i], 
             ptr_low[i], 
