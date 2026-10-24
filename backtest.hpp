@@ -1,8 +1,16 @@
 #pragma once
 
+#include <map>
+#include <string>
+#include <variant>
 #include "candle.hpp"
+//make account.hpp
 #include "account.cpp"
 #include <vector>
+///#include "strategy.hpp"
+
+using ParameterValue = std::variant<int, double, bool, std::string>;
+using ParameterSet = std::map<std::string, ParameterValue>;
 
 //loop over all candles, add one by one to strategy
 //when strategy executes based on close price, place order on next open
@@ -11,10 +19,28 @@
 //the market can jump over (ie close above stoploss and open below) in this case, fill at open.
 
 
+
 class Backtest {
  private:
   Account persistantAccount;
   std::vector<Candle> candles;
+  bool candlesLoaded = false;
+
+  struct BacktestResult{
+    std::string strategy_id;
+    ParameterSet params;
+    std::pair<int,int> period;
+    double initial_equity;
+    double final_equity;
+    //double CAGR;
+    //double max_drawdown;
+    double sharpe;
+    double sortino;
+    double volatility;
+    int trade_count;
+    double win_rate;
+    //account snapshot??
+  };
 
  public: 
   Backtest(){}
@@ -22,11 +48,10 @@ class Backtest {
   void loadCandles(const std::vector<Candle>& input);
   
   //runs the backtest on own backtest object, returns (preferably) json with data or final balance
-  double runBacktestPersistant(); //takes params, returns account's balance for now
-  double runBacktestTraining();   //takes params, returns sharpe ratio
-  
-  double runBacktest(); //takes params, makes strat, runs backtest, returns sharpe ratio for now
-  //todo: design how to get sharpe ratio, how to pass account?? and sharpe ratio at the same time without repeating myself
+  BacktestResult runBacktestPersistant(); //takes params/period
+  BacktestResult runBacktestTraining();   //takes params/period creates new account
+
+  BacktestResult runBacktest(); //takes params/period/account, makes strat, runs backtest
 };
 
 
