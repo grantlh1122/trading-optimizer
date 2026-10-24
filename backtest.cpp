@@ -10,7 +10,10 @@
    Backtest::Backtest() = default;
 
    void Backtest::loadCandles(const std::vector<Candle>& input) {
-      candles = input;
+      if (candlesLoaded = false){
+         candles = input;
+         candlesLoaded = true;
+      }
    }
 
 
