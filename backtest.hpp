@@ -13,14 +13,20 @@
 
 class Backtest {
  private:
-   Account persistantAccount;
-   //Strategy* strategy;
-   std::vector<Candle> candles;
+  Account persistantAccount;
+  //Strategy* strategy;
+  std::vector<Candle> candles;
 
  public: 
-   Backtest(){}
+  Backtest(){}
 
-   void loadCandles(const std::vector<Candle>& input);
+  void loadCandles(const std::vector<Candle>& input);
+  
+  //runs the backtest on own backtest object, returns (preferably) json with data or final balance
+  double runBacktestPersistant(); //takes params
+  double runBacktestTraining();   //takes params
+  
+  
 };
 
 
