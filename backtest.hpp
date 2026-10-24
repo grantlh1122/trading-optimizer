@@ -14,7 +14,6 @@
 class Backtest {
  private:
   Account persistantAccount;
-  //Strategy* strategy;
   std::vector<Candle> candles;
 
  public: 
@@ -23,10 +22,11 @@ class Backtest {
   void loadCandles(const std::vector<Candle>& input);
   
   //runs the backtest on own backtest object, returns (preferably) json with data or final balance
-  double runBacktestPersistant(); //takes params
-  double runBacktestTraining();   //takes params
+  double runBacktestPersistant(); //takes params, returns account's balance for now
+  double runBacktestTraining();   //takes params, returns sharpe ratio
   
-  
+  double runBacktest(); //takes params, makes strat, runs backtest, returns sharpe ratio for now
+  //todo: design how to get sharpe ratio, how to pass account?? and sharpe ratio at the same time without repeating myself
 };
 
 
