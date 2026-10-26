@@ -1,8 +1,4 @@
-#include <vector>
-#include <iostream>
-#include <cassert>
-
-//todo: make header file for this and backtester
+#include "account.hpp"
 
 /*
 
@@ -37,11 +33,9 @@ run only 9 individual times, all with the same
 account.
 */
 
-class Account {
- public:
     //ctors: initial and passing prev orders
-    Account() {};
-    Account(double buyingPower) : buyingPower(buyingPower) {};
+    Account::Account() = default;
+    Account::Account(double buyingPower) : buyingPower(buyingPower) {};
 
     //TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
     //this will require a system that allows multiple tickers
@@ -50,7 +44,7 @@ class Account {
     //calculates how many you're willing to buy with risk fraction.
     //then buys that many or as many as can be afforded.
     //TODO: calculate slippage
-    void buyOrder(double risk_frac, double price, double stop_loss_price = 0, double take_profit_price = 0){
+    void Account::buyOrder(double risk_frac, double price, double stop_loss_price, double take_profit_price){
         assert(risk_frac >= 0 && risk_frac <= 1 && price >= 0 && stop_loss_price >= 0 && take_profit_price >= 0);
         assert(stop_loss_price <= price && take_profit_price >= price);
 
@@ -66,7 +60,7 @@ class Account {
     }
 
     //sells all positions TODO: of a given ticker, Slippage
-    void sellOrder(double price){
+    void Account::sellOrder(double price){
         price *= 1 - SLIPPAGE_RATE;
         for(int i = positions.size() - 1; i >= 0; --i){
             buyingPower += price * positions[i].quantity;
@@ -74,29 +68,7 @@ class Account {
         }
     }
 
- private:
-    struct Position{
-        //for if I want to add short/long
-        //enum class Side { Long = 1, Short = -1};
-        //Side side; 
-        int quantity = -1;
-        double entry_price = -1;
-        // if 0, no stop loss / take profit for that order
-        double stop_loss_price = -1;
-        double take_profit_price = -1;
-        //if any value here is -1, something went wrong.
-
-        Position(int qty, double price, double stop_loss_price, double take_profit_price) : 
-        quantity(qty), entry_price(price), stop_loss_price(stop_loss_price), take_profit_price(take_profit_price){}
-
-    };
-
-    static constexpr double SLIPPAGE_RATE = 0.001;
-    double buyingPower = 100'000;
-    std::vector<Position> positions;
-    //map of tickers to quantity
-};
-
+/*
 int main(){
 
     Account Grant;
@@ -107,4 +79,4 @@ int main(){
     
 }
 
-
+*/

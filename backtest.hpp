@@ -4,8 +4,7 @@
 #include <string>
 #include <variant>
 #include "candle.hpp"
-//make account.hpp
-#include "account.cpp"
+#include "account.hpp"
 #include <vector>
 ///#include "strategy.hpp"
 
@@ -43,7 +42,7 @@ class Backtest {
   };
 
  public: 
-  Backtest(){}
+  Backtest();
 
   void loadCandles(const std::vector<Candle>& input);
   
