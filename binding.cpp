@@ -1,4 +1,4 @@
-//what dis do Allows Python to call constructor and functions
+//???? Allows Python to call constructor and functions
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
@@ -19,7 +19,7 @@ PYBIND11_MODULE(market_module, m){
          py::array_t<double> close_arr,
          py::array_t<int> volume_arr) {
             std::vector<Candle> temp_candles;
-            //what dis do Gets buffer for pointers
+            //???? Gets buffer for pointers
             //auto buffer_timestamp = timestamp_arr.request();
             auto buffer_open = open_arr.request();
             auto buffer_high = high_arr.request();
@@ -27,7 +27,7 @@ PYBIND11_MODULE(market_module, m){
             auto buffer_close = close_arr.request();
             auto buffer_volume = volume_arr.request();
 
-            //what dis do Sets pointers to the buffers
+            //???? Sets pointers to the buffers
             //std::int64_t* ptr_timestamp = static_cast<std::int64_t*>(buffer_timestamp.ptr);
             double* ptr_open = static_cast<double*>(buffer_open.ptr);
             double* ptr_high = static_cast<double*>(buffer_high.ptr);
