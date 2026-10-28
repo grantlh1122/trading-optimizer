@@ -19,6 +19,7 @@ class Backtest {
   Account persistantAccount;
   std::vector<Candle> candles;
   bool candlesLoaded = false;
+  int next_candle_index = 0;
 
   struct BacktestResult{
     std::string strategy_id;
@@ -40,6 +41,7 @@ class Backtest {
   Backtest();
 
   void loadCandles(const std::vector<Candle>& input);
+  void loadWarmupCandles(const int warmup_period);
   
   //runs the backtest on own backtest object, returns (preferably) json with data or final balance
   BacktestResult runBacktestPersistant(); //takes params/period
@@ -48,6 +50,8 @@ class Backtest {
   //requires: warmup period > slow period > fast period
   BacktestResult runBacktest(Account& account, const ParameterSet& params,
     const int period_start, const int period_end, const int warmup_period); //takes params/period/account, makes strat, runs backtest
+
 };
+
 
 
