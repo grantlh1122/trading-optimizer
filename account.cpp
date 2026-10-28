@@ -62,12 +62,12 @@ void Account::buyOrder(double risk_frac, double price, double stop_loss_price, d
 
 //sells all positions TODO: of a given ticker, Slippage
 void Account::full_sell_order(double fill_price){
-    for(int i = positions.size() - 1; i >= 0; --i){
-        sell_order(i, fill_price);
+    for(std::size_t i = positions.size(); i > 0; --i){
+        sell_order(i - 1, fill_price);
     }
 }
 
-void Account::sell_order(int index, double price){
+void Account::sell_order(std::size_t index, double price){
     buyingPower += price * positions[index].quantity;
     positions.erase(positions.begin() + index);
 }
@@ -78,6 +78,7 @@ void Account::close_position(CloseRequest close_request){
     for(int i = 0; i < positions.size(); ++i){
         if(positions.at(i).position_id == close_request.position_id){
             sell_order(i, close_request.fill_price);
+            return;
         }
     }
 }

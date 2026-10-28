@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <iostream>
 #include <cassert>
@@ -27,7 +28,7 @@ class Account {
     void buyOrder(double risk_frac, double price, 
         double stop_loss_price = 0, double take_profit_price = 0);
     void full_sell_order(double fill_price);
-    void sell_order(int index, double price);
+    void sell_order(std::size_t index, double price);
     void close_position(CloseRequest close_request);
 
     const std::vector<Position>& get_positions() const;
