@@ -2,7 +2,8 @@
 #include <cassert>
 
 
-Strategy* strategyFactory(const std::string& strategy_id, const ParameterSet& params){
+std::unique_ptr<Strategy> strategyFactory(const std::string& strategy_id, 
+    const ParameterSet& params){
     if(strategy_id != "mac"){assert(false);};
 
     double risk_frac = std::get<double>(params.at("risk_frac"));
@@ -13,8 +14,8 @@ Strategy* strategyFactory(const std::string& strategy_id, const ParameterSet& pa
         int fastPeriod = std::get<int>(params.at("fast_period"));
         int slowPeriod = std::get<int>(params.at("slow_period"));
 
-        return new MovingAverageCrossoverStrategy(fastPeriod, slowPeriod, 
-            risk_frac, stop_loss_frac, take_profit_frac);
+        return std::make_unique<MovingAverageCrossoverStrategy>(fastPeriod, 
+            slowPeriod, risk_frac, stop_loss_frac, take_profit_frac);
     }
 }
 

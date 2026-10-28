@@ -5,6 +5,7 @@
 #include "candle.hpp"
 #include <string>
 #include <deque>
+#include <memory>
 
 
 using ParameterValue = std::variant<int, double, bool, std::string>;
@@ -38,6 +39,8 @@ class Strategy{
     virtual OrderRequest generateSignal(const Candle& nextCandle) = 0;
     virtual void loadCandle(const Candle& nextCandle);
 
+    virtual ~Strategy() = default;
+
  private:
     std::vector<Candle> candles;
 };
@@ -50,6 +53,7 @@ class MovingAverageCrossoverStrategy : public Strategy {
     //requires: warmup candles finished
     OrderRequest generateSignal(const Candle& nextCandle) override;
     void loadCandle(const Candle& nextCandle) override;
+
 
  private: 
     const int fast_periods;
@@ -69,4 +73,5 @@ class MovingAverageCrossoverStrategy : public Strategy {
 };
 
 //Todo: error check params
-Strategy* strategyFactory(const std::string& strategy_id, const ParameterSet& params);
+std::unique_ptr<Strategy> strategyFactory(const std::string& strategy_id, 
+    const ParameterSet& params);
