@@ -4,6 +4,7 @@
 #include <variant>
 #include "candle.hpp"
 #include <string>
+#include <deque>
 
 
 using ParameterValue = std::variant<int, double, bool, std::string>;
@@ -12,7 +13,7 @@ using ParameterSet = std::map<std::string, ParameterValue>;
 enum OrderType{
     BUY = 1,
     HOLD = 0,
-    SELL = 1
+    SELL = -1
 };
 
 struct MovingAverageCrossoverParams{
@@ -35,6 +36,8 @@ class Strategy{
  public:
     //will take strategy id and factory it with parameter set
     virtual OrderRequest generateSignal(const Candle& nextCandle) = 0;
+    virtual void loadCandle(const Candle& nextCandle);
+
  private:
     std::vector<Candle> candles;
 };
@@ -45,7 +48,7 @@ class MovingAverageCrossoverStrategy : public Strategy {
         double stop_loss, double take_profit);
 
     OrderRequest generateSignal(const Candle& nextCandle) override;
-    void loadCandle(const Candle& nextCandle);
+    void loadCandle(const Candle& nextCandle) override;
 
  private: 
     const int fast_periods;
@@ -54,9 +57,15 @@ class MovingAverageCrossoverStrategy : public Strategy {
     const double stop_loss_frac;
     const double take_profit_frac;
 
-    double fast_MA;
-    double slow_MA;
+
+    double fast_sum = 0;
+    double slow_sum = 0;
+    double fast_MA = 0;
+    double slow_MA = 0;
+    std::deque<double> fast_closes;
+    std::deque<double> slow_closes;
     
 };
 
-Strategy* strategyFactory(const std::string& strategy_id);
+//Todo: error check params
+Strategy* strategyFactory(const std::string& strategy_id, ParameterSet params);
