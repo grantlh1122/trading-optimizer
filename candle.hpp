@@ -4,11 +4,12 @@
 struct Candle {
     //todo: add date to each candle
     //std::int64_t timestamp;
-    const double open;
-    const double high;
-    const double low;
-    const double close;
-    const int volume;
+    //pass candle by const ref
+    double open;
+    double high;
+    double low;
+    double close;
+    int volume;
 };
 
 //store in PANDAS DATAFRAME 
