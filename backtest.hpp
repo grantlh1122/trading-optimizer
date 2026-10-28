@@ -45,6 +45,7 @@ class Backtest {
   BacktestResult runBacktestPersistant(); //takes params/period
   BacktestResult runBacktestTraining();   //takes params/period creates new account
 
+  //requires: warmup period > slow period > fast period
   BacktestResult runBacktest(); //takes params/period/account, makes strat, runs backtest
 };
 
