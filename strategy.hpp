@@ -47,6 +47,7 @@ class MovingAverageCrossoverStrategy : public Strategy {
     MovingAverageCrossoverStrategy(int fast, int slow, double risk, 
         double stop_loss, double take_profit);
 
+    //requires: warmup candles finished
     OrderRequest generateSignal(const Candle& nextCandle) override;
     void loadCandle(const Candle& nextCandle) override;
 
