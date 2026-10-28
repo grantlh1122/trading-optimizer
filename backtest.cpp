@@ -16,7 +16,22 @@ void Backtest::loadCandles(const std::vector<Candle>& input) {
    }
 }
 
-Backtest::BacktestResult Backtest::runBacktest(Account& account, const ParameterSet& params,
-    const int period_start, const int period_end, const int warmup_period){
+Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::string& strategy_id, 
+      const ParameterSet& params, const int period_start, const int period_end, const int warmup_period){
+   std::unique_ptr<Strategy> strategy = strategyFactory(strategy_id, params);
+   int next_candle_index = period_start - warmup_period;
+   loadWarmupCandles(warmup_period, next_candle_index, *strategy);
+   //next_candle_index should now be period start?
+   for(; next_candle_index <= period_end; ++next_candle_index){
 
+   }
+
+}
+
+void Backtest::loadWarmupCandles(const int warmup_period, 
+   int& next_candle_index, Strategy& strategy){
+   for(int i = 0; i < warmup_period; ++i){
+      strategy.loadCandle(candles.at(next_candle_index));
+      ++next_candle_index;
+   }
 }
