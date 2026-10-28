@@ -7,13 +7,16 @@
 
 
 
-   Backtest::Backtest() = default;
+Backtest::Backtest() = default;
 
-   void Backtest::loadCandles(const std::vector<Candle>& input) {
-      if (!candlesLoaded){
-         candles = input;
-         candlesLoaded = true;
-      }
+void Backtest::loadCandles(const std::vector<Candle>& input) {
+   if (!candlesLoaded){
+      candles = input;
+      candlesLoaded = true;
    }
+}
 
+Backtest::BacktestResult Backtest::runBacktest(Account& account, const ParameterSet& params,
+    const int period_start, const int period_end, const int warmup_period){
 
+}

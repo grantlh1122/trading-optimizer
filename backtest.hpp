@@ -46,7 +46,8 @@ class Backtest {
   BacktestResult runBacktestTraining();   //takes params/period creates new account
 
   //requires: warmup period > slow period > fast period
-  BacktestResult runBacktest(Account& account, const ParameterSet& params); //takes params/period/account, makes strat, runs backtest
+  BacktestResult runBacktest(Account& account, const ParameterSet& params,
+    const int period_start, const int period_end, const int warmup_period); //takes params/period/account, makes strat, runs backtest
 };
 
 
