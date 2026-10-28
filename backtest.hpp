@@ -1,15 +1,10 @@
 #pragma once
 
-#include <map>
 #include <string>
-#include <variant>
 #include "candle.hpp"
 #include "account.hpp"
 #include <vector>
-///#include "strategy.hpp"
-
-using ParameterValue = std::variant<int, double, bool, std::string>;
-using ParameterSet = std::map<std::string, ParameterValue>;
+#include "strategy.hpp"
 
 //loop over all candles, add one by one to strategy
 //when strategy executes based on close price, place order on next open
