@@ -74,10 +74,10 @@ void Account::sell_order(int index, double price){
 
 
 //could make this faster with a hashmap from O(n) to O(1)
-void Account::close_position(int position_id, double fill_price){
+void Account::close_position(CloseRequest close_request){
     for(int i = 0; i < positions.size(); ++i){
-        if(positions.at(i).position_id == position_id){
-            sell_order(i, fill_price);
+        if(positions.at(i).position_id == close_request.position_id){
+            sell_order(i, close_request.fill_price);
         }
     }
 }

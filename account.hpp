@@ -13,6 +13,11 @@ struct Position{
     double take_profit_price;
 };
 
+struct CloseRequest {
+    int position_id;
+    double fill_price;
+};
+
 class Account {
  public:
     //ctors: initial and passing prev orders
@@ -23,10 +28,10 @@ class Account {
         double stop_loss_price = 0, double take_profit_price = 0);
     void full_sell_order(double fill_price);
     void sell_order(int index, double price);
-    void close_position(int position_id, double fill_price);
+    void close_position(CloseRequest close_request);
 
     const std::vector<Position>& get_positions() const;
-    
+
  private:
 
     double buyingPower = 100'000;
