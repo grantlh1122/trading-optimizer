@@ -2,7 +2,7 @@
 #include <cassert>
 
 
-Strategy* strategyFactory(const std::string& strategy_id, ParameterSet params){
+Strategy* strategyFactory(const std::string& strategy_id, const ParameterSet& params){
     if(strategy_id != "mac"){assert(false);};
 
     double risk_frac = std::get<double>(params.at("risk_frac"));

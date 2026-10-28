@@ -69,4 +69,4 @@ class MovingAverageCrossoverStrategy : public Strategy {
 };
 
 //Todo: error check params
-Strategy* strategyFactory(const std::string& strategy_id, ParameterSet params);
+Strategy* strategyFactory(const std::string& strategy_id, const ParameterSet& params);
