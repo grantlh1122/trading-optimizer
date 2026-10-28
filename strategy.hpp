@@ -28,8 +28,8 @@ struct MovingAverageCrossoverParams{
 struct OrderRequest{
     const OrderType type;
     const double risk_frac = -1;
-    const double stop_loss_percent = -1;
-    const double take_profit_percent = 1;
+    const double stop_loss_frac = -1;
+    const double take_profit_frac = -1;
 };
 
 
