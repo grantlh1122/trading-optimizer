@@ -33,41 +33,58 @@ run only 9 individual times, all with the same
 account.
 */
 
-    //ctors: initial and passing prev orders
-    Account::Account() = default;
-    Account::Account(double buyingPower) : buyingPower(buyingPower) {};
+//ctors: initial and passing prev orders
+Account::Account() = default;
+Account::Account(double buyingPower) : buyingPower(buyingPower) {};
 
-    //TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
-    //this will require a system that allows multiple tickers
+//TODO: pass in a value that allows dynamic sizing based on volatility of different tickers
+//this will require a system that allows multiple tickers
 
 
-    //calculates how many you're willing to buy with risk fraction.
-    //then buys that many or as many as can be afforded.
-    //TODO: calculate slippage
-    void Account::buyOrder(double risk_frac, double price, double stop_loss_price, double take_profit_price){
-        assert(risk_frac >= 0 && risk_frac <= 1 && price >= 0 && stop_loss_price >= 0 && take_profit_price >= 0);
-        assert(stop_loss_price <= price && take_profit_price >= price);
+//calculates how many you're willing to buy with risk fraction.
+//then buys that many or as many as can be afforded.
+//TODO: position invariants
+void Account::buyOrder(double risk_frac, double price, double stop_loss_price, double take_profit_price){
+    assert(risk_frac >= 0 && risk_frac <= 1 && price >= 0 && stop_loss_price >= 0 && take_profit_price >= 0);
+    assert(stop_loss_price <= price && take_profit_price >= price);
 
-        price *= 1 + SLIPPAGE_RATE;
-        int qty = (int)((buyingPower * risk_frac) / (price - stop_loss_price));
-        int qty_afforded = (int)(buyingPower / price);
-        qty = std::min(qty, qty_afforded);
+    int qty_want = (int)((buyingPower * risk_frac) / (price - stop_loss_price));
+    int qty_afforded = (int)(buyingPower / price);
+    int qty_to_buy = std::min(qty_want, qty_afforded);
 
-        if(qty > 0){
-            positions.push_back(Position(qty, price, stop_loss_price, take_profit_price));
-            buyingPower -= qty * price;
+    if(qty_to_buy > 0){
+        positions.push_back({next_position_id, qty_to_buy, 
+            price, stop_loss_price, take_profit_price});
+        buyingPower -= qty_to_buy * price;
+        ++next_position_id;
+    }
+}
+
+//sells all positions TODO: of a given ticker, Slippage
+void Account::full_sell_order(double fill_price){
+    for(int i = positions.size() - 1; i >= 0; --i){
+        sell_order(i, fill_price);
+    }
+}
+
+void Account::sell_order(int index, double price){
+    buyingPower += price * positions[index].quantity;
+    positions.erase(positions.begin() + index);
+}
+
+
+//could make this faster with a hashmap from O(n) to O(1)
+void Account::close_position(int position_id, double fill_price){
+    for(int i = 0; i < positions.size(); ++i){
+        if(positions.at(i).position_id == position_id){
+            sell_order(i, fill_price);
         }
     }
+}
 
-    //sells all positions TODO: of a given ticker, Slippage
-    void Account::sellOrder(double price){
-        price *= 1 - SLIPPAGE_RATE;
-        for(int i = positions.size() - 1; i >= 0; --i){
-            buyingPower += price * positions[i].quantity;
-            positions.erase(positions.begin() + i);
-        }
-    }
-
+const std::vector<Position>& Account::get_positions() const{
+    return positions;
+}
 /*
 int main(){
 
