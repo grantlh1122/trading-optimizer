@@ -30,7 +30,7 @@ class Account {
     //sells all positions of that ticker
     void full_sell_order(double fill_price);
     //sell helper don't use
-    void sell_order(std::size_t index, double price);
+    void sell_order(int index, double price);
     //sells given position_id, remove closerequest struct?
     void close_position(CloseRequest close_request);
 

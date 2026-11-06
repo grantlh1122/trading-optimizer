@@ -44,10 +44,10 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
          account.full_sell_order(sell_fill);
       }
    }
-   result.final_equity = account.get_equity(candles[period_end].open);
+   result.final_equity = account.get_equity(calculate_sell_slippage(candles[period_end].open));
    result.trade_count = account.get_trade_count();
-   result.win_rate = 1.0 * (account.get_win_count() + 
-      account.get_num_winning_positions(candles[period_end].open))
+   result.win_rate = (account.get_trade_count() == 0) ? 0 : 1.0 * (account.get_win_count() + 
+      account.get_num_winning_positions(calculate_sell_slippage(candles[period_end].open)))
       / account.get_trade_count();
    //TBD: sharpe, trade count, win rate
    return result;

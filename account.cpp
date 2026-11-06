@@ -57,17 +57,19 @@ void Account::buyOrder(double risk_frac, double price, double stop_loss_price, d
             price, stop_loss_price, take_profit_price});
         buyingPower -= qty_to_buy * price;
         ++next_position_id;
+        ++trade_count;
     }
 }
 
 //sells all positions TODO: of a given ticker, Slippage
 void Account::full_sell_order(double fill_price){
-    for(std::size_t i = positions.size(); i > 0; --i){
-        sell_order(i - 1, fill_price);
+    for(int i = positions.size() - 1; i >= 0; --i){
+        sell_order(i, fill_price);
     }
 }
 
-void Account::sell_order(std::size_t index, double price){
+void Account::sell_order(int index, double price){
+    if(price > positions[index].entry_price) ++win_count;
     buyingPower += price * positions[index].quantity;
     positions.erase(positions.begin() + index);
 }
@@ -78,6 +80,27 @@ double Account::get_equity(double price){
         equity += positions[i].quantity * price;
     }
     return equity;
+}
+
+int Account::get_win_count(){
+    return win_count;
+}
+
+int Account::get_num_winning_positions(double price){
+    int num_winning = 0;
+    for(int i = 0; i < positions.size(); ++i){
+        if(price > positions[i].entry_price) ++num_winning;
+    }
+    return num_winning;
+}
+
+int Account::get_trade_count(){
+    return trade_count;
+}
+
+void Account::reset_counters(){
+    win_count = 0;
+    trade_count = 0;
 }
 
 
