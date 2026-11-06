@@ -24,6 +24,10 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
       {period_start, period_end}, account.get_equity(candles[period_start].open));
    account.reset_counters();
 
+   std::vector<double> equity_history;
+   equity_history.reserve(period_end - period_start + 1);
+   equity_history.push_back(result.initial_equity);
+
    int next_candle_index = period_start - warmup_period;
    loadWarmupCandles(warmup_period, next_candle_index, *strategy);
    //trades on [period_start, period_end)
@@ -43,13 +47,37 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
       } else if(signal.type == SELL){
          account.full_sell_order(sell_fill);
       }
+      equity_history.push_back(account.get_equity(next_open));
    }
    result.final_equity = account.get_equity(calculate_sell_slippage(candles[period_end].open));
    result.trade_count = account.get_trade_count();
    result.win_rate = (account.get_trade_count() == 0) ? 0 : 1.0 * (account.get_win_count() + 
       account.get_num_winning_positions(calculate_sell_slippage(candles[period_end].open)))
       / account.get_trade_count();
-   //TBD: sharpe, trade count, win rate
+
+   //calculate sharpe ratio. for now, its based on a 6 month window of hour candles
+   const int n = equity_history.size();
+   const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.5 / n) - 1;
+   std::vector<double> excess_returns;
+   excess_returns.reserve(n + 1);
+   double sum = 0;
+
+   for(int i = 1; i < equity_history.size(); ++i){
+      const double candle_return = equity_history[i] / equity_history[i-1] - 1;
+      const double excess_return = candle_return - risk_free_per_candle;
+      excess_returns.push_back(excess_return);
+      sum += excess_return;
+   }
+
+   const double mean = sum / n;
+   double squared_devs = 0;
+   for(double x : excess_returns){
+      squared_devs += (x - mean) * (x - mean);
+   }
+   const double stdev = std::sqrt(squared_devs / (n-1));
+
+   result.sharpe = mean/stdev;
+
    return result;
 }
 
