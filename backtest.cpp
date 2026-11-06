@@ -20,7 +20,9 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
       const ParameterSet& params, const int period_start, const int period_end, const int warmup_period){
 
    std::unique_ptr<Strategy> strategy = strategyFactory(strategy_id, params);
-   BacktestResult result(strategy_id, params, {period_start, period_end}, account.get_equity());
+   BacktestResult result(strategy_id, params, 
+      {period_start, period_end}, account.get_equity(candles[period_start].open));
+   account.reset_counters();
 
    int next_candle_index = period_start - warmup_period;
    loadWarmupCandles(warmup_period, next_candle_index, *strategy);
@@ -42,9 +44,11 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
          account.full_sell_order(sell_fill);
       }
    }
-   result.final_equity = account.get_equity();
+   result.final_equity = account.get_equity(candles[period_end].open);
    result.trade_count = account.get_trade_count();
-   result.win_rate = 1.0 * account.get_win_count() / account.get_trade_count();
+   result.win_rate = 1.0 * (account.get_win_count() + 
+      account.get_num_winning_positions(candles[period_end].open))
+      / account.get_trade_count();
    //TBD: sharpe, trade count, win rate
    return result;
 }

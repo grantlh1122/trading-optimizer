@@ -20,6 +20,7 @@ class Backtest {
   std::vector<Candle> candles;
   bool candlesLoaded = false;
   static constexpr double SLIPPAGE_RATE = 0.001;
+  static constexpr double RISK_FREE_RATE = 0.0487;
 
   struct BacktestResult{
     std::string strategy_id;
@@ -30,8 +31,8 @@ class Backtest {
     //double CAGR;
     //double max_drawdown;
     double sharpe;
-    double sortino;
-    double volatility;
+    //double sortino;
+   // double volatility;
     int trade_count;
     double win_rate;
     //account snapshot??

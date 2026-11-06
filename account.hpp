@@ -27,14 +27,19 @@ class Account {
 
     void buyOrder(double risk_frac, double price, 
         double stop_loss_price = 0, double take_profit_price = 0);
+    //sells all positions of that ticker
     void full_sell_order(double fill_price);
+    //sell helper don't use
     void sell_order(std::size_t index, double price);
+    //sells given position_id, remove closerequest struct?
     void close_position(CloseRequest close_request);
 
     int get_trade_count();
-    double get_equity();
+    double get_equity(double price);
     int get_win_count();
-    int get_num_winning_positions();
+    int get_num_winning_positions(double price);
+
+    void reset_counters();
 
     const std::vector<Position>& get_positions() const;
 

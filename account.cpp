@@ -72,6 +72,14 @@ void Account::sell_order(std::size_t index, double price){
     positions.erase(positions.begin() + index);
 }
 
+double Account::get_equity(double price){
+    double equity = buyingPower;
+    for(int i = 0; i < positions.size(); ++i){
+        equity += positions[i].quantity * price;
+    }
+    return equity;
+}
+
 
 //could make this faster with a hashmap from O(n) to O(1)
 void Account::close_position(CloseRequest close_request){
