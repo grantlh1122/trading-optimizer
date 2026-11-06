@@ -31,6 +31,11 @@ class Account {
     void sell_order(std::size_t index, double price);
     void close_position(CloseRequest close_request);
 
+    int get_trade_count();
+    double get_equity();
+    int get_win_count();
+    int get_num_winning_positions();
+
     const std::vector<Position>& get_positions() const;
 
  private:
@@ -38,6 +43,10 @@ class Account {
     double buyingPower = 100'000;
     std::vector<Position> positions;
     int next_position_id = 0;
+    //incremented every buy
+    int trade_count = 0;
+    //incremented every sell
+    int win_count = 0;
     //map of tickers to quantity
 };
 

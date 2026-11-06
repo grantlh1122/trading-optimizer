@@ -18,7 +18,10 @@ void Backtest::loadCandles(const std::vector<Candle>& input) {
 
 Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::string& strategy_id, 
       const ParameterSet& params, const int period_start, const int period_end, const int warmup_period){
+
    std::unique_ptr<Strategy> strategy = strategyFactory(strategy_id, params);
+   BacktestResult result(strategy_id, params, {period_start, period_end}, account.get_equity());
+
    int next_candle_index = period_start - warmup_period;
    loadWarmupCandles(warmup_period, next_candle_index, *strategy);
    //trades on [period_start, period_end)
@@ -39,7 +42,11 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
          account.full_sell_order(sell_fill);
       }
    }
-   //return Backtest result, next project
+   result.final_equity = account.get_equity();
+   result.trade_count = account.get_trade_count();
+   result.win_rate = 1.0 * account.get_win_count() / account.get_trade_count();
+   //TBD: sharpe, trade count, win rate
+   return result;
 }
 
 void Backtest::check_candle_against_orders(Account& account, 

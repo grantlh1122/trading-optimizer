@@ -35,6 +35,10 @@ class Backtest {
     int trade_count;
     double win_rate;
     //account snapshot??
+
+    BacktestResult(const std::string& id, 
+      const ParameterSet& param, std::pair<int, int> period, double start_equity) : 
+        params(param), period(period), initial_equity(start_equity) {}
   };
 
  public: 
