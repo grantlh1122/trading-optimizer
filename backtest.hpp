@@ -12,17 +12,7 @@
 //candle high is greater than takeprofit and same for stoploss. However,
 //the market can jump over (ie close above stoploss and open below) in this case, fill at open.
 
-
-
-class Backtest {
- private:
-  Account persistantAccount;
-  std::vector<Candle> candles;
-  bool candlesLoaded = false;
-  static constexpr double SLIPPAGE_RATE = 0.001;
-  static constexpr double RISK_FREE_RATE = 0.0487;
-
-  struct BacktestResult{
+struct BacktestResult{
     std::string strategy_id;
     ParameterSet params;
     std::pair<int,int> period;
@@ -41,6 +31,14 @@ class Backtest {
       const ParameterSet& param, std::pair<int, int> period, double start_equity) : 
         params(param), period(period), initial_equity(start_equity) {}
   };
+
+class Backtest {
+ private:
+  Account persistantAccount;
+  std::vector<Candle> candles;
+  bool candlesLoaded = false;
+  static constexpr double SLIPPAGE_RATE = 0.001;
+  static constexpr double RISK_FREE_RATE = 0.0487;
 
  public: 
   Backtest();

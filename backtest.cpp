@@ -16,7 +16,7 @@ void Backtest::loadCandles(const std::vector<Candle>& input) {
    }
 }
 
-Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::string& strategy_id, 
+BacktestResult Backtest::runBacktest(Account& account, const std::string& strategy_id, 
       const ParameterSet& params, const int period_start, const int period_end, const int warmup_period){
 
    std::unique_ptr<Strategy> strategy = strategyFactory(strategy_id, params);
@@ -57,7 +57,8 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
 
    //calculate sharpe ratio. for now, its based on a 6 month window of hour candles
    const int n = equity_history.size();
-   const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.5 / n) - 1;
+   //const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.5 / n) - 1;
+   const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.25 / (n-1)) - 1;
    std::vector<double> excess_returns;
    excess_returns.reserve(n + 1);
    double sum = 0;
@@ -69,12 +70,12 @@ Backtest::BacktestResult Backtest::runBacktest(Account& account, const std::stri
       sum += excess_return;
    }
 
-   const double mean = sum / n;
+   const double mean = sum / excess_returns.size();
    double squared_devs = 0;
    for(double x : excess_returns){
       squared_devs += (x - mean) * (x - mean);
    }
-   const double stdev = std::sqrt(squared_devs / (n-1));
+   const double stdev = std::sqrt(squared_devs / (excess_returns.size()-1));
 
    result.sharpe = mean/stdev;
 
@@ -104,6 +105,12 @@ void Backtest::check_candle_against_orders(Account& account,
       for(int i = 0; i < close_requests.size(); ++i){
          account.close_position(close_requests.at(i));
       }
+   }
+
+   BacktestResult Backtest::runBacktestTraining(const std::string& strategy_id, 
+         const ParameterSet& params, const int period_start, const int period_end, const int warmup_period){
+      Account account;
+      return runBacktest(account, strategy_id, params, period_start, period_end, warmup_period);
    }
 
 void Backtest::loadWarmupCandles(const int warmup_period, 
