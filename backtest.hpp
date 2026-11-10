@@ -39,7 +39,7 @@ class Backtest {
   bool candlesLoaded = false;
   static constexpr double SLIPPAGE_RATE = 0.001;
   static constexpr double RISK_FREE_RATE = 0.0487;
-
+ 
  public: 
   Backtest();
 

@@ -62,7 +62,7 @@ BacktestResult Backtest::runBacktest(Account& account, const std::string& strate
    std::vector<double> excess_returns;
    excess_returns.reserve(n + 1);
    double sum = 0;
-
+ 
    for(int i = 1; i < equity_history.size(); ++i){
       const double candle_return = equity_history[i] / equity_history[i-1] - 1;
       const double excess_return = candle_return - risk_free_per_candle;
