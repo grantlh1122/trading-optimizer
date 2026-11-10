@@ -1,0 +1,36 @@
+Backtester flow:
+Backtester creates account (stores positions) and 
+strategy object (which stores all params), passes a bunch of candles to strategy (1 year)
+Backtester starts. for each candle:
+Backtester asks for signal from strategy. Strategy generates order request. 
+Do it at the price of the next open.
+Then backtester passes the order -1 or 1 to the account. The account will attempt to buy/sell using given risk frac 
+or TODO volatility percentage. 
+Account will turn this into a position, which will be checked every candle by the backtest.
+If it was a take profit or stoploss hit, determine if it
+happened (1) before open (sell at open) or (2) during candle (sell high/low)
+
+To be designed:
+each time the backtest is run, it will be on a set period, called a timeframe of number of candles. 
+keep one backtest object for the whole program. it will contain the main account, and the ability to run the 
+backtest on a set of new parameters by making a strategy object, passing in warmup candles, then passing in live candles
+one by one. here, just return the x ratio to measure success for optuna. The "live" one will return the account
+but more importantly keep track of its main account object. to either of these functions, the calling wrapper will need to handle
+timeframes. Perhaps make a timeframe json format that python and cpp can both read. a json file should also be used to 
+interpret the user input and turn it into a parameter set, TO BE DESIGNED LATER.
+
+To change parameters for the live version, simply maintain the same account but change the strategy object out. To prevent bias,
+maintain a maximum lookback of x candles, I am thinking 1 year as that's the warmup period I'm passing in for consistency.
+Determine if it would add bias to use every candle every time, and if it would, what the optimal range is to minimize bias.
+
+//previous note
+im thinking, every time you backtest you pass in 1 year prior of candles instantly, just to determine indicators.
+then run 6 months of candles, actually simulating trades. If training, return sharpe ratio to optuna. 
+if live trading, also swap strategy object entirely, you will need to recalculate MA. return account to python wrapper.
+the main backtesting object should pass in the same candles as the training ones.
+prob easier to get newest params (if not first period), simulate the one backtest (using one backtest object that has 
+every candle). then, run the training on that same period (many times with many different parameters) on a new backtest
+object each time.
+
+1 warmup year, 4 years of training/ trading. 6 month periods means 8 training periods and 7 trading, assuming we continue 
+training up till end to display final reccomended params.
