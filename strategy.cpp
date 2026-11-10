@@ -1,4 +1,4 @@
-#include <strategy.hpp>
+#include "strategy.hpp"
 #include <cassert>
 
 
@@ -17,9 +17,15 @@ std::unique_ptr<Strategy> strategyFactory(const std::string& strategy_id,
         return std::make_unique<MovingAverageCrossoverStrategy>(fastPeriod, 
             slowPeriod, risk_frac, stop_loss_frac, take_profit_frac);
     }
+    return nullptr;
 }
 
 //MAC Strategy
+
+MovingAverageCrossoverStrategy::MovingAverageCrossoverStrategy(
+    int fast, int slow, double risk, double stop_loss, double take_profit) : 
+    fast_periods(fast), slow_periods(slow), risk_frac(risk),
+    stop_loss_frac(stop_loss), take_profit_frac(take_profit) {}
 
 OrderRequest MovingAverageCrossoverStrategy::generateSignal(const Candle& nextCandle){
     double old_fast_MA = fast_MA;

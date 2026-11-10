@@ -37,7 +37,7 @@ class Strategy{
  public:
     //will take strategy id and factory it with parameter set
     virtual OrderRequest generateSignal(const Candle& nextCandle) = 0;
-    virtual void loadCandle(const Candle& nextCandle);
+    virtual void loadCandle(const Candle& nextCandle) = 0;
 
     virtual ~Strategy() = default;
 
