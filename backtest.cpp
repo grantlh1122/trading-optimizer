@@ -56,6 +56,15 @@ BacktestResult Backtest::runBacktest(Account& account, const std::string& strate
       / account.get_trade_count();
 
    //calculate sharpe ratio. for now, its based on a 6 month window of hour candles
+
+   //NEXT ORDER OF BUSINESS: make candles include a timestamp. then use that timestamp to 
+   //add 1 candle to equity history every day. pull sharpe into its own function, write 
+   //documentation stating that it returns an annualized sharpe ratio, based on the number
+   //of days in the equity history. then we are ready to finally write unit tests for strategy
+   //and backtester.
+
+
+
    const int n = equity_history.size();
    //const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.5 / n) - 1;
    const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.25 / (n-1)) - 1;
