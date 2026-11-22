@@ -57,10 +57,12 @@ class Backtest {
   BacktestResult runBacktest(Account& account, const std::string& strategy_id, const ParameterSet& params,
     const int period_start, const int period_end, const int warmup_period); //takes params/period/account, makes strat, runs backtest
 
-    void check_candle_against_orders(Account& account, 
-      const Candle& candle);
+  void check_candle_against_orders(Account& account, const Candle& candle);
 
-    double calculate_sell_slippage(double price);
+  double calculate_sell_slippage(double price);
+
+  //using daily close equity sampling
+  double calculate_sharpe(const std::vector<double>& equity_history);
 
 };
 

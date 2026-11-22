@@ -25,17 +25,18 @@ BacktestResult Backtest::runBacktest(Account& account, const std::string& strate
    account.reset_counters();
 
    std::vector<double> equity_history;
-   equity_history.reserve(period_end - period_start + 1);
-   equity_history.push_back(result.initial_equity);
 
-   int next_candle_index = period_start - warmup_period;
-   loadWarmupCandles(warmup_period, next_candle_index, *strategy);
+   int candle_index = period_start - warmup_period;
+   loadWarmupCandles(warmup_period, candle_index, *strategy);
    //trades on [period_start, period_end)
-   for(; next_candle_index < period_end; ++next_candle_index){
-      check_candle_against_orders(account, candles.at(next_candle_index));
+   for(; candle_index < period_end; ++candle_index){
+      check_candle_against_orders(account, candles.at(candle_index));
+      if(candles[candle_index].timestamp + 4000 < candles[candle_index + 1].timestamp){
+         equity_history.push_back(account.get_equity(candles[candle_index].close));
+      }
 
-      OrderRequest signal = strategy->generateSignal(candles.at(next_candle_index));
-      double next_open = candles.at(next_candle_index + 1).open;
+      OrderRequest signal = strategy->generateSignal(candles.at(candle_index));
+      double next_open = candles.at(candle_index + 1).open;
       double buy_fill = next_open * (1 + SLIPPAGE_RATE);
       double sell_fill = next_open * (1 - SLIPPAGE_RATE);
 
@@ -47,7 +48,8 @@ BacktestResult Backtest::runBacktest(Account& account, const std::string& strate
       } else if(signal.type == SELL){
          account.full_sell_order(sell_fill);
       }
-      equity_history.push_back(account.get_equity(next_open));
+      
+      
    }
    result.final_equity = account.get_equity(calculate_sell_slippage(candles[period_end].open));
    result.trade_count = account.get_trade_count();
@@ -57,36 +59,13 @@ BacktestResult Backtest::runBacktest(Account& account, const std::string& strate
 
    //calculate sharpe ratio. for now, its based on a 6 month window of hour candles
 
-   //NEXT ORDER OF BUSINESS: make candles include a timestamp. then use that timestamp to 
+   //NEXT ORDER OF BUSINESS: then use that timestamp to 
    //add 1 candle to equity history every day. pull sharpe into its own function, write 
    //documentation stating that it returns an annualized sharpe ratio, based on the number
    //of days in the equity history. then we are ready to finally write unit tests for strategy
    //and backtester.
 
-
-
-   const int n = equity_history.size();
-   //const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.5 / n) - 1;
-   const double risk_free_per_candle = std::pow(1 + RISK_FREE_RATE, 0.25 / (n-1)) - 1;
-   std::vector<double> excess_returns;
-   excess_returns.reserve(n + 1);
-   double sum = 0;
- 
-   for(int i = 1; i < equity_history.size(); ++i){
-      const double candle_return = equity_history[i] / equity_history[i-1] - 1;
-      const double excess_return = candle_return - risk_free_per_candle;
-      excess_returns.push_back(excess_return);
-      sum += excess_return;
-   }
-
-   const double mean = sum / excess_returns.size();
-   double squared_devs = 0;
-   for(double x : excess_returns){
-      squared_devs += (x - mean) * (x - mean);
-   }
-   const double stdev = std::sqrt(squared_devs / (excess_returns.size()-1));
-
-   result.sharpe = mean/stdev;
+   result.sharpe = calculate_sharpe(equity_history);
 
    return result;
 }
@@ -123,13 +102,17 @@ void Backtest::check_candle_against_orders(Account& account,
    }
 
 void Backtest::loadWarmupCandles(const int warmup_period, 
-   int& next_candle_index, Strategy& strategy){
+   int& candle_index, Strategy& strategy){
    for(int i = 0; i < warmup_period; ++i){
-      strategy.loadCandle(candles.at(next_candle_index));
-      ++next_candle_index;
+      strategy.loadCandle(candles.at(candle_index));
+      ++candle_index;
    }
 }
 
 double Backtest::calculate_sell_slippage(double price){
   return price - price * SLIPPAGE_RATE;
+}
+
+double Backtest::calculate_sharpe(const std::vector<double>& equity_history){
+
 }
