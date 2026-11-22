@@ -20,15 +20,16 @@ std::vector<Candle> read_candles_from_csv(const std::string& filename){
 
     while(std::getline(fin, line)){
         std::stringstream row(line);
-        std::string close, high, low, open, volume;
+        std::string timestamp, close, high, low, open, volume;
 
+        std::getline(row, timestamp, ',');
         std::getline(row, close, ',');
         std::getline(row, high, ',');
         std::getline(row, low, ',');
         std::getline(row, open, ',');
         std::getline(row, volume, ',');
 
-        candles.push_back({std::stod(open), std::stod(high),
+        candles.push_back({std::stoll(timestamp), std::stod(open), std::stod(high),
             std::stod(low), std::stod(close), stoi(volume)});
     }
 

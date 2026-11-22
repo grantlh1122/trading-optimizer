@@ -9,14 +9,18 @@ import market_module
 def main():
     engine = market_module.Backtest()
 
-    df = yf.download("^GSPC", period="6mo", interval="1h")
+    df = yf.download("SPY", period="3y", interval="1h")
     
     df.columns = df.columns.get_level_values(0)
     df = df.dropna()
-###df.to_csv("SPY_1h_6mo.csv", index=False)
+    timestamps = df.index.as_unit("s").asi8
+    df.insert(0, "Timestamp", timestamps)
+
+    df.to_csv("SPY_1h_3yr.csv", index=False)
     
 
     engine.loadCandles(
+        timestamps,
         df['Open'].to_numpy(dtype=np.float64),
         df['High'].to_numpy(dtype=np.float64),
         df['Low'].to_numpy(dtype=np.float64),

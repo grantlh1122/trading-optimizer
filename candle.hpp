@@ -1,10 +1,9 @@
 #pragma once
-//#include <cstdint>
+#include <cstdint>
 
 struct Candle {
-    //todo: add date to each candle
-    //std::int64_t timestamp;
     //pass candle by const ref
+    std::int64_t timestamp;
     double open;
     double high;
     double low;
